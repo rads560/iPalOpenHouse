@@ -16,15 +16,10 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".RunArmActivity"
-            android:label="RunArmByFolder" >
-        </activity>
-
-        <activity
-            android:name=".RunArmByStreamsActivity"
-            android:label="RunArmByAsserts" >
-        </activity>
+        <!--<activity-->
+            <!--android:name=".RunArmByStreamsActivity"-->
+            <!--android:label="RunArmByAsserts" >-->
+        <!--</activity>-->
     </application>
 
 </manifest>

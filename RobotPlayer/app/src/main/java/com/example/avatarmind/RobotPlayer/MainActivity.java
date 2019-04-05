@@ -1,26 +1,49 @@
 package com.example.avatarmind.RobotPlayer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.robot.hw.RobotDevices;
+import android.robot.motion.RobotMotion;
+import android.robot.motion.RobotPlayer;
+import android.robot.speech.SpeechManager;
+import android.robot.speech.SpeechService;
+import android.text.TextUtils;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.TextView;
+
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
 
+//    private static final String TAG = "RunArmActivity";
     private static final String TAG = "MainActivity";
 
+    private RobotPlayer mRobotPlayer;
+    private RobotMotion mRobotMotion;
     private ImageView mTitleBack;
+    private Button mRunBtn;
+    private Button mPauseBtn;
+    private Button mResumeBtn;
+    private Button mStopBtn;
+    private int mArmLen = 0;
+    private int mPosition;
+    private SpeechManager mSpeechManager;
 
-    private ListView mListView;
+    private SpeechManager.TtsListener mTtsListener = new SpeechManager.TtsListener() {
+        @Override
+        public void onBegin(int requestId) { }
+        @Override
+        public void onEnd(int requestId) { }
+        @Override
+        public void onError(int error) { }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,48 +52,100 @@ public class MainActivity extends Activity {
             getActionBar().hide();
         }
 
+        mRobotPlayer = new RobotPlayer();
+        mRobotMotion = new RobotMotion();
+        Intent intent = getIntent();
+        mPosition = intent.getIntExtra("Mode", -1);
+
+//        mRobotPlayer.setDataSource("/sdcard/media/surprised.arm");
+        mRobotPlayer.setDataSource(getFromAssets("surprised.arm"), 0, mArmLen);
+        mRobotPlayer.prepare();
         initView();
         initListener();
+
+        String tts = "Hello there!";
+        mRobotPlayer.start();
+        mSpeechManager.startSpeaking(tts);
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mRobotMotion.reset(RobotDevices.Units.ALL_MOTORS);
+        mRobotPlayer.stop();
+
+        tts = "You're a star!";
+//        mRobotPlayer.setDataSource(getFromAssets("surprised.arm"), 0, mArmLen);
+//        mRobotPlayer.prepare();
+
+        mSpeechManager.startSpeaking(tts);
+        mRobotPlayer.start();
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mRobotMotion.reset(RobotDevices.Units.ALL_MOTORS);
+        mRobotPlayer.stop();
+
+//        tts = "Oh bother!";
+//        mSpeechManager.startSpeaking(tts);
+//        mRobotPlayer.start();
+
+//        if (mPosition != -1) {
+//            if (mPosition == 0) {
+//                mRobotPlayer.setDataSource("/sdcard/media/surprised.arm");
+//                System.out.println("mickey");
+//
+//            } else if (mPosition == 1) {
+//                mRobotPlayer.setDataSource(getFromAssets("surprised.arm"), 0, mArmLen);
+//                System.out.println("minnie");
+//            }
+//
+//            mRobotPlayer.prepare();
+//            initView();
+//            initListener();
+//        }
     }
 
     private void initView() {
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_arm);
 
         mTitleBack = (ImageView) findViewById(R.id.common_title_back);
+        TextView title = (TextView) findViewById(R.id.common_title_text);
 
-        mListView = (ListView) findViewById(R.id.main_list);
-        mListView.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_expandable_list_item_1, getOptions()));
+        if (mPosition == 0) {
+            title.setText("Run .arm Files By File");
+        } else if (mPosition == 1) {
+            title.setText("Run .arm Files By Streams");
+        }
+
+        mSpeechManager = (SpeechManager) getSystemService(SpeechService.SERVICE_NAME);
+
+        mRunBtn = (Button) findViewById(R.id.run);
+        mPauseBtn = (Button) findViewById(R.id.pause);
+        mResumeBtn = (Button) findViewById(R.id.resume);
+        mStopBtn = (Button) findViewById(R.id.stop);
+
     }
 
     private void initListener() {
-        mListView.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                Intent intent = new Intent();
-                intent.putExtra("Mode", position);
-                intent.setClass(MainActivity.this, RunArmActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mTitleBack.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-
-        });
+        mSpeechManager.setTtsListener(mTtsListener);
     }
 
-    private List<String> getOptions() {
-        List<String> data = new ArrayList<String>();
-        data.add(getString(R.string.run_by_file));
-        data.add(getString(R.string.run_by_streams));
+    private byte[] getFromAssets(String fileName) {
+        try {
+            InputStream in = getResources().getAssets().open(fileName);
+            mArmLen = in.available();
+            byte[] buffer = new byte[mArmLen];
+            in.read(buffer);
+            return buffer;
 
-        return data;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new byte[0];
     }
+
 }
