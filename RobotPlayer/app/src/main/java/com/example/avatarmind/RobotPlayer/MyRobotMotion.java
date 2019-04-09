@@ -138,7 +138,13 @@ public class MyRobotMotion {
 
         else if(msg.contains(IS_BLOCKED) || msg.contains(HUMAN_SCORE)){
             int id = Integer.parseInt(msg.split(" ")[1]);
-            makeRobotMoveWithCustomSadMotion(id);
+            int motion = rand.nextInt(10)+1;
+            if(motion == 1 || motion == 2){
+                //do nothing
+            }
+            else{
+                makeRobotMoveWithCustomSadMotion(id);
+            }
             int song = rand.nextInt(2)+1;
             if(song == 1) {
                 playSong(R.raw.incorrect1);
@@ -155,7 +161,13 @@ public class MyRobotMotion {
 
         else if(msg.contains(HAS_BLOCKED) || msg.contains(IPAL_SCORE)){
             int id = Integer.parseInt(msg.split(" ")[1]);
-            makeRobotMoveWithCustomHappyMotion(id);
+            int motion = rand.nextInt(10)+1;
+            if(motion == 1 || motion == 2){
+                //do nothing
+            }
+            else{
+                makeRobotMoveWithCustomHappyMotion(id);
+            }
             //LEILIIIIIII
             int song = rand.nextInt(2)+1;
             if(song == 1) {
