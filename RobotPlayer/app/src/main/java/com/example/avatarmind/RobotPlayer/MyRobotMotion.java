@@ -29,6 +29,9 @@ public class MyRobotMotion {
     private static final String IPAL_SCORE = "iPal_score";
     private static final String HUMAN_SCORE = "human_score";
 
+    private static final String INTRO = "intro";
+    private static final String END = "end";
+
     private final static String TAG = MyRobotMotion.class.getSimpleName();
 
     private static MyRobotMotion mrm = null;
@@ -121,20 +124,46 @@ public class MyRobotMotion {
 
         }
 
+        else if(msg.contains(INTRO)){
+            playSong(R.raw.intro);
+            mRobotMotion.emoji(RobotMotion.Emoji.DEFAULT);
+            Log.i("INTRO","");
+        }
+
+        else if(msg.contains(END)){
+            playSong(R.raw.end);
+            mRobotMotion.emoji(RobotMotion.Emoji.DEFAULT);
+            Log.i("END","");
+        }
+
         else if(msg.contains(IS_BLOCKED) || msg.contains(HUMAN_SCORE)){
             int id = Integer.parseInt(msg.split(" ")[1]);
             makeRobotMoveWithCustomSadMotion(id);
+            int song = rand.nextInt(2)+1;
+            if(song == 1) {
+                playSong(R.raw.incorrect1);
+            }
+            else{
+                playSong(R.raw.incorrect2);
+            }
             //LEILIIIIIII
-            playSong(R.raw.no);
-            mRobotMotion.emoji(RobotMotion.Emoji.SAD);
+//            playSong(R.raw.no);
+            mRobotMotion.emoji(RobotMotion.Emoji.DEFAULT);
             Log.i("MSG",msg);
+
         }
 
         else if(msg.contains(HAS_BLOCKED) || msg.contains(IPAL_SCORE)){
             int id = Integer.parseInt(msg.split(" ")[1]);
             makeRobotMoveWithCustomHappyMotion(id);
             //LEILIIIIIII
-            playSong(R.raw.yay);
+            int song = rand.nextInt(2)+1;
+            if(song == 1) {
+                playSong(R.raw.correct1);
+            }
+            else{
+                playSong(R.raw.correct2);
+            }
             mRobotMotion.emoji(RobotMotion.Emoji.SMILE);
             Log.i("MSG",msg);
         }
@@ -169,6 +198,10 @@ public class MyRobotMotion {
         makeRobotMoveWithCustomSadMotion(id);
     }
 
+    public void makeRobotIntro(int id){
+        makeRobotMoveWithCustomSadMotion(id);
+    }
+
     public RobotMotion getmRobotMotion() {
         return mRobotMotion;
     }
@@ -196,7 +229,8 @@ public class MyRobotMotion {
         mRobotPlayer.prepare();
         mRobotPlayer.start();
     }
-    public void makeRobotMoveWithCustomSadMotion(int id) {
+
+    public void makeRobotMoveWithCustomIntroMotion(int id) {
 
         // Load binary ARM data stream
         //Leili
@@ -204,10 +238,10 @@ public class MyRobotMotion {
         byte[] movement = getFromAssets("sad"+ String.valueOf(n)+".arm");
 
         if( n == 1 || n == 4) {
-            mRobotMotion.doAction(RobotMotion.Emoji.CRY);
+            mRobotMotion.doAction(RobotMotion.Emoji.INDIFFERENT);
         }
         else{
-            mRobotMotion.doAction(RobotMotion.Emoji.SAD);
+            mRobotMotion.doAction(RobotMotion.Emoji.INDIFFERENT);
         }
         // play ARM frame sequence
         mRobotPlayer = new RobotPlayer();
@@ -220,6 +254,31 @@ public class MyRobotMotion {
         //mRobotMotion.emoji(RobotMotion.Emoji.DEFAULT);
         Log.i("Sad Gesture ",""+n);
 
+    }
+
+    public void makeRobotMoveWithCustomSadMotion(int id) {
+
+        // Load binary ARM data stream
+        //Leili
+        int n = id;//rand.nextInt(5) +1 ;
+        byte[] movement = getFromAssets("sad"+ String.valueOf(n)+".arm");
+
+        if( n == 1 || n == 4) {
+            mRobotMotion.doAction(RobotMotion.Emoji.INDIFFERENT);
+        }
+        else{
+            mRobotMotion.doAction(RobotMotion.Emoji.INDIFFERENT);
+        }
+        // play ARM frame sequence
+        mRobotPlayer = new RobotPlayer();
+        mRobotPlayer.setDataSource(movement, 0, movement.length);
+        mRobotPlayer.prepare();
+        mRobotPlayer.start();
+
+        //mRobotPlayer.stop();
+
+        //mRobotMotion.emoji(RobotMotion.Emoji.DEFAULT);
+        Log.i("Sad Gesture ",""+n);
 
     }
 
@@ -280,7 +339,6 @@ public class MyRobotMotion {
     private void playSong(int id){
      mediaPlayer = MediaPlayer.create(context,id);
      mediaPlayer.start();
-
     }
 
 

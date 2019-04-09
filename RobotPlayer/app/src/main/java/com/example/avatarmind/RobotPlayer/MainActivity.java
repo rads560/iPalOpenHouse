@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
-import com.pubnub.api.PubNubUtil;
+//import com.pubnub.api.PubNubUtil;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
@@ -28,7 +28,18 @@ public class MainActivity extends Activity {
 
     private RobotMotion mRobotMotion;
 
-    private PubNubUtil nubUtil;
+    //        PNConfiguration pnConfiguration = new PNConfiguration();
+
+//        pnConfiguration.setSubscribeKey("my_subkey");
+
+//        pnConfiguration.setPublishKey("my_pubkey");
+
+//        pnConfiguration.setSecure(true);
+
+
+//        PubNub pubnub = new PubNub(pnConfiguration);
+
+    private PubNubUtil nubUtil = new PubNubUtil(ANDROID_DEVICE);
     private static final String PUBLISH_SUBSCRIBE_KEY = "demo";
     private static final String ANDROID_DEVICE = "Ipal_Robot";
     private static final String CHANNEL_NAME = "awesomeChannel";
@@ -47,7 +58,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         mRobotMotion = MyRobotMotion.getInstanceOfMyRobotMotion(this).getmRobotMotion();
-        pubNubInit();//pubNubInit();
+        myPubNubInit(); //pubNubInit();
         mRobotMotion.reset((int) RobotDevices.Units.ALL_MOTORS);
 
         mSpeechManager = (SpeechManager)getSystemService(SpeechService.SERVICE_NAME);
@@ -90,19 +101,12 @@ public class MainActivity extends Activity {
     }
 
     public void myPubNubInit(){
-        PNConfiguration pnConfiguration = new PNConfiguration();
-        pnConfiguration.setSubscribeKey("my_subkey");
-        pnConfiguration.setPublishKey("my_pubkey");
-        pnConfiguration.setSecure(true);
 
-//        PubNub pubnub = new PubNub(pnConfiguration);
-//
-//        nubUtil = new PubNubUtil(ANDROID_DEVICE);
-//        nubUtil.setSubscribeKey(PUBLISH_SUBSCRIBE_KEY);
-//        nubUtil.setPublishKey(PUBLISH_SUBSCRIBE_KEY);
-//        nubUtil.buildConfig();
-//        nubUtil.buildChannel();
-//        nubUtil.subscribeToChannel(CHANNEL_NAME);
+        nubUtil.setSubscribeKey(PUBLISH_SUBSCRIBE_KEY);
+        nubUtil.setPublishKey(PUBLISH_SUBSCRIBE_KEY);
+        nubUtil.buildConfig();
+        nubUtil.buildChannel();
+        nubUtil.subscribeToChannel(CHANNEL_NAME);
 
     }
 
